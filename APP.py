@@ -37,7 +37,7 @@ def add_word(update, context):
         conn.commit()
         cursor.execute('''SELECT count(*) FROM words WHERE users = %(id)s''', {'id': user})
         num = cursor.fetchone()[0]
-        updater.dispatcher.bot.send_message(135249522, f"Added {word}({num})")
+        updater.dispatcher.bot.send_message(user, f"Added {word}({num})")
     except Exception as e:
         conn.rollback()
         updater.dispatcher.bot.send_message(user, f"ERRORE {str(e)}")
