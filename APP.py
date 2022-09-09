@@ -56,7 +56,7 @@ class Sender(Thread):
     def run(self) -> None:
         while (True):
             sleep(1)
-            if datetime.datetime.now().hour == 9:
+            if datetime.datetime.now().hour == 9 or True:
                 self.send()
 
     def send(self):
@@ -65,13 +65,24 @@ class Sender(Thread):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
+            cursor2 = conn.cursor()
             conn.commit()
-            cursor.execute('''SELECT DISTINCT ON (users) * FROM words ORDER BY users, random()''')
-            for row in cursor.fetchall():
-                try:
-                    updater.dispatcher.bot.send_message(row[2], str(row[1]))
-                except Exception as e:
-                    pass
+            if datetime.datetime.now().weekday() != 6 and False:
+                cursor.execute('''SELECT DISTINCT ON (users) * FROM words ORDER BY users, random()''')
+                for row in cursor.fetchall():
+                    try:
+                        updater.dispatcher.bot.send_message(row[2], str(row[1]))
+                    except Exception as e:
+                        pass
+            else:
+                cursor.execute('''SELECT DISTINCT users FROM words''')
+                cursor2.execute(f'''SELECT word FROM words ORDER BY random() LIMIT {cursor.rowcount}''')
+                words = cursor2.fetchall()
+                for user in cursor.fetchall():
+                    try:
+                        updater.dispatcher.bot.send_message(user[0], str(words.pop()[0]))
+                    except Exception as e:
+                        pass
         finally:
             if cursor is not None:
                 cursor.close()
