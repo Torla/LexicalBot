@@ -3,4 +3,4 @@ services:
   bot:
     build: .
     volumes:
-      - var/opt/lessico_bot/data:/data
+      - /var/opt/lessico_bot/data:/data
