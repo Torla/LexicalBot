@@ -1,0 +1,5 @@
+CREATE TABLE WORDS (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    users TEXT,
+    word TEXT
+    )

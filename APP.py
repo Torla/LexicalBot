@@ -5,7 +5,7 @@ from threading import Thread
 from time import sleep
 from typing import List
 
-import psycopg2
+import sqlite3
 from telegram.ext import Updater, MessageHandler, Filters
 
 updater = Updater(token=os.environ.get('BOT_TOKEN'), use_context=True)
@@ -17,11 +17,10 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 
 def get_db_connection():
-    return psycopg2.connect(host=os.environ.get('DB_HOST'),
-                            port=os.environ.get('DB_PORT'),
-                            user=os.environ.get('DB_USER'),
-                            password=os.environ.get('DB_PSW'),
-                            database=os.environ.get('DB_NAME'))
+    if not os.path.exists(os.path.join("data", "db")):
+        with sqlite3.connect(os.path.join("data", "db")) as conn:
+            conn.execute(open("schema.sql").read())
+    return sqlite3.connect(os.path.join("data", "db"))
 
 
 def add_word(update, context):
@@ -32,10 +31,10 @@ def add_word(update, context):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(''' INSERT INTO words(users,word) VALUES (%(id)s,%(text)s);
-        ''', {'id': user, 'text': word})
+        cursor.execute(''' INSERT INTO words(users,word) VALUES (?,?);
+        ''', (str(user), str(word)))
         conn.commit()
-        cursor.execute('''SELECT count(*) FROM words WHERE users = %(id)s''', {'id': user})
+        cursor.execute('''SELECT count(*) FROM words WHERE users = ?''', (str(user),))
         num = cursor.fetchone()[0]
         updater.dispatcher.bot.send_message(user, f"Added {word}({num})")
     except Exception as e:
@@ -69,21 +68,21 @@ class Sender(Thread):
             cursor2 = conn.cursor()
             conn.commit()
             if datetime.datetime.now().weekday() != 6:
-                cursor.execute('''SELECT DISTINCT ON (users) * FROM words ORDER BY users, random()''')
+                cursor.execute('''SELECT * FROM words ORDER BY random() limit 1''')
                 for row in cursor.fetchall():
                     try:
-                        updater.dispatcher.bot.send_message(row[2], str(row[1]))
+                        updater.dispatcher.bot.send_message(int(row[1]),row[2])
                     except Exception as e:
-                        pass
-            else:
-                cursor.execute('''SELECT DISTINCT users FROM words''')
-                cursor2.execute(f'''SELECT word FROM words ORDER BY random() LIMIT {cursor.rowcount}''')
-                words = cursor2.fetchall()
-                for user in cursor.fetchall():
-                    try:
-                        updater.dispatcher.bot.send_message(user[0], str(words.pop()[0]))
-                    except Exception as e:
-                        pass
+                        print(e)
+            # else:
+            #     cursor.execute('''SELECT DISTINCT users FROM words''')
+            #     cursor2.execute(f'''SELECT word FROM words ORDER BY random() LIMIT {cursor.rowcount}''')
+            #     words = cursor2.fetchall()
+            #     for user in cursor.fetchall():
+            #         try:
+            #             updater.dispatcher.bot.send_message(user[0], str(words.pop()[0]))
+            #         except Exception as e:
+            #             pass
         finally:
             if cursor is not None:
                 cursor.close()
