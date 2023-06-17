@@ -2,5 +2,7 @@ version: '3.7'
 services:
   bot:
     build: .
+    environment:
+      - BOT_TOKEN=$BOT_TOKEN
     volumes:
       - /var/opt/lessico_bot/data:/data
