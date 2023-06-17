@@ -57,6 +57,7 @@ class Sender(Thread):
             sleep(1)
             if datetime.datetime.now().hour == 9:
                 self.send()
+            sleep(3700)
 
     def send(self):
         conn = None
