@@ -1,6 +1,6 @@
 name: lessico bot prod
 run-name: lessico-bot
-on: [push]
+on: push
 jobs:
   runs-on: self-hosted
   - steps:
