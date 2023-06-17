@@ -2,12 +2,13 @@ name: lessico bot prod
 run-name: lessico-bot
 on: push
 jobs:
-  runs-on: self-hosted
-  - steps:
-     - name: Check out repository code
-     uses: actions/checkout@v3
-     - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-     - run: docker compose build
-     - run: docker compose down
-     - run: docker compose up -d
-     - run: docker image prune -f
+  deploy:
+    runs-on: self-hosted
+    - steps:
+       - name: Check out repository code
+       uses: actions/checkout@v3
+       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+       - run: docker compose build
+       - run: docker compose down
+       - run: docker compose up -d
+       - run: docker image prune -f
