@@ -3,7 +3,6 @@ run-name: lessico-bot
 on: push
 jobs:
   deploy:
-    runs-on: self-hosted
     - steps:
        - name: Check out repository code
        uses: actions/checkout@v3
