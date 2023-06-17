@@ -1,4 +1,5 @@
 name: lessico bot prod
+run-name: lessico-bot
 on: [push]
 jobs:
   runs-on: self-hosted
