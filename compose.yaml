@@ -5,4 +5,4 @@ services:
     environment:
       - BOT_TOKEN=$BOT_TOKEN
     volumes:
-      - /var/opt/lessico_bot/data:/data
+      - lexico_db:/data
