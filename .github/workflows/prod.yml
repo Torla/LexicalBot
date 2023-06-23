@@ -9,6 +9,7 @@ jobs:
        - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
        - run: docker compose build
        - run: docker compose down
-       - run: export BOT_TOKEN=${{secrets.BOT_TOKEN}}
        - run: docker compose up -d
+         env:
+           - credentials: ${{secrets.BOT_TOKEN}}
        - run: docker image prune -f
